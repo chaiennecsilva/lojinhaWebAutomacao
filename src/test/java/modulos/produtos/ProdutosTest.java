@@ -25,7 +25,7 @@ public class ProdutosTest {
         navegador.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 
        //Navegar para a pagina da Lojinha Web
-        navegador.get("http://165.227.93.41/lojinha-web/v2/");
+        navegador.get("http://165.227.93.41/lojinha-web-bugada/v2/");
 
        //Fazer login
         navegador.findElement(By.cssSelector("label[for='usuario']")).click(); //no navegador depois de clicar no campo usuario
