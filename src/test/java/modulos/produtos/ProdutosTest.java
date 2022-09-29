@@ -1,72 +1,136 @@
 package modulos.produtos;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
+import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import paginas.LoginPage;
 
 import java.time.Duration;
 
 @DisplayName("Testes Web do Modulo de Produtos")
 public class ProdutosTest {
+
+    //dentro do escopo da classe declara um atributo
+    private WebDriver navegador;
+
+    @BeforeEach
+    //todo os testes que eu quero que seja executado antes de cada teste
+    public void beforeEach(){
+        //Abrir o navegador(setar uma propriedade para falar que é o chromedriver que vai ser intermediario entre nosso script e o brower)
+        System.setProperty("webdriver.chrome.driver", "C:\\drivers\\chromedriver_win32\\chromedriver.exe");
+
+        //usar a variavel da classe que foi criada acima fora do metodo [WebDriver navegador = new ChromeDriver()]
+        this.navegador = new ChromeDriver();
+
+        //Vou maximar a tela
+        this.navegador.manage().window().maximize();
+
+        //Vou definir um tempo de espera padrão de até 5 segundos
+        this.navegador.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        //Navegar para a pagina da Lojinha Web
+        this.navegador.get("http://165.227.93.41/lojinha-web/v2/");
+    }
+
     @Test
     @DisplayName("Nao e permitido registrar um produto com valor igual a zero")
     public void testNaoEPermitidoRegistrarProdutoComValorIgualAZero(){
-       //Abrir o navegador(setar uma propriedade para falar que é o chromedriver que vai ser intermediario entre nosso script e o brower)
-        System.setProperty("webdriver.chrome.driver", "C:\\drivers\\chromedriver_win32\\chromedriver.exe");
-        WebDriver navegador = new ChromeDriver();
+       //Fazer login:instaciar a LoginPage com o metodo que a gente criou ficando assim mais claro o codigo
+        String mensagemApresentada = new LoginPage(navegador)
+              .informarOUsuario("admin")
+                .informarASenha("admin")
+                    .submeterFormularioDeLogin()
+                        .acessarFormularioAdicaoNovoProduto()
+                                .informarNomeProduto("Macbook Pro")
+                                        .informarValorProduto("0")
+                                                .informarCoresProduto("red, black")
+                                                    .submeterFormularioDeAdicaoComErro()
+                                                            .capturarMensagemApresentada();
 
-        //Vou maximar a tela
-        navegador.manage().window().maximize();
+        //Resumindo: abra a pagina de login, informe o usuario e a senha, e submeta o formulario de login. Acesse o formulario de adicao de um
+        //novo produto e preencha os dados pedidos e submetada com erro. E no final me da ai a mgs apresentada(caputura ela e joga na msg toast).
+        //E dentro de assetions eu quero que apareca essa mgs apresentada.
 
-        //Vou definir um tempo de espera padrão de até 5 segundos
-        navegador.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        Assertions.assertEquals("O valor do produto deve estar entre R$ 0,01 e R$ 7.000,00", mensagemApresentada);
+    }
 
-       //Navegar para a pagina da Lojinha Web
-        navegador.get("http://165.227.93.41/lojinha-web/v2/");
+    @Test
+    @DisplayName("Nao e permitido registrar um produto com valor acima de sete mil")
+    public void testNaoEPermitidoRegistrarUmProdutoComValorAcimaDeSeteMil(){
+        String mensagemApresentada = new LoginPage(navegador)
+                .informarOUsuario("admin")
+                .informarASenha("admin")
+                .submeterFormularioDeLogin()
+                .acessarFormularioAdicaoNovoProduto()
+                .informarNomeProduto("Macbook Max")
+                .informarValorProduto("7.000.01")
+                .informarCoresProduto("red, black")
+                .submeterFormularioDeAdicaoComErro()
+                .capturarMensagemApresentada();
 
-       //Fazer login
-        navegador.findElement(By.cssSelector("label[for='usuario']")).click(); //no navegador depois de clicar no campo usuario
-        navegador.findElement(By.id("usuario")).sendKeys("admin");//digite no campo com id:usuario admin
+        //Resumindo: abra a pagina de login, informe o usuario e a senha, e submeta o formulario de login. Acesse o formulario de adicao de um
+        //novo produto e preencha os dados pedidos e submetada com erro. E no final me da ai a mgs apresentada(caputura ela e joga na msg toast).
+        //E dentro de assetions eu quero que apareca essa mgs apresentada.
 
-        navegador.findElement(By.cssSelector("label[for='senha']")).click();//clicar no campo da senha
-        navegador.findElement(By.id("senha")).sendKeys("admin");//digite no campo a senha
+        Assertions.assertEquals("O valor do produto deve estar entre R$ 0,01 e R$ 7.000,00", mensagemApresentada);
+    }
 
-        navegador.findElement(By.cssSelector("button[type='submit']")).click();//clicar no botão entrar
+    @Test
+    @DisplayName("Posso adicionar produtos que estejam na faixa de 0,01 a 7.000,00")
+    public void testPossoAdicionarProdutosQueEstejamNaFaixaDeUmcentavoASeteMilReiais(){
+        String mensagemApresentada = new LoginPage(navegador)
+                .informarOUsuario("admin")
+                .informarASenha("admin")
+                .submeterFormularioDeLogin()
+                .acessarFormularioAdicaoNovoProduto()
+                .informarNomeProduto("Iphone 13 MAX")
+                .informarValorProduto("5,000.13")
+                .informarCoresProduto("red, gold")
+                .submeterFormularioDeAdicaoComSucesso()
+                .capturarMensagemApresentada();
 
+        Assertions.assertEquals("Produto adicionado com sucesso", mensagemApresentada);
 
-       //Vou preencher dados do produto e o valor sera igual a zero
-        navegador.findElement(By.cssSelector("a[href='http://165.227.93.41/lojinha-web/v2/produto/novo']")).click();//clicar no link add produto
+    }
 
-        navegador.findElement(By.cssSelector("label[for='produtonome']")).click();//clicar no campo nome do produto
-        navegador.findElement(By.id("produtonome")).sendKeys("Iphone 14 Pro");//digitar no campo o nome do produto a ser add
+    @Test
+    @DisplayName("Posso adicionar produtos que estejam no limite de 0,01 ")
+    public void testPossoAdicionarProdutosComValorDeUmCentavo(){
+        String mensagemApresentada = new LoginPage(navegador)
+                .informarOUsuario("admin")
+                .informarASenha("admin")
+                .submeterFormularioDeLogin()
+                .acessarFormularioAdicaoNovoProduto()
+                .informarNomeProduto("Iphone 13 MAX")
+                .informarValorProduto("0.01")
+                .informarCoresProduto("red, gold")
+                .submeterFormularioDeAdicaoComSucesso()
+                .capturarMensagemApresentada();
 
-        navegador.findElement(By.cssSelector("label[for='produtovalor']")).click();//clicar no campo valor do produto
-        navegador.findElement(By.id("produtovalor")).sendKeys("0");//digitar o valor 0 no campo valor do produto
+        Assertions.assertEquals("Produto adicionado com sucesso", mensagemApresentada);
 
-        navegador.findElement(By.cssSelector("label[for='produtocores']")).click();//clicar no campo cores do produto
-        navegador.findElement(By.id("produtocores")).sendKeys("black, red");//digitar as cores dos produtos no campo
+    }
 
+    @Test
+    @DisplayName("Posso adicionar produtos que estejam no limite de 7.000.00 ")
+    public void testPossoAdicionarProdutosComValorDeSeteMilReais(){
+        String mensagemApresentada = new LoginPage(navegador)
+                .informarOUsuario("admin")
+                .informarASenha("admin")
+                .submeterFormularioDeLogin()
+                .acessarFormularioAdicaoNovoProduto()
+                .informarNomeProduto("Iphone 13 MAX")
+                .informarValorProduto("70000")
+                .informarCoresProduto("red, gold")
+                .submeterFormularioDeAdicaoComSucesso()
+                .capturarMensagemApresentada();
 
-        //outra forma de preencher o formulario sem o clicar exatamente no campo, fazendo assim o seu teste mais rapido
-        //navegador.findElement(By.id("produtonome")).sendKeys("Iphone 13");//digitar no campo o nome do produto a ser add
-        //navegador.findElement(By.name("produtovalor")).sendKeys("0");//digitar o valor 0 no campo valor do produto
-        //navegador.findElement(By.id("produtocores")).sendKeys("black, red");//digitar as cores dos produtos no campo
+        Assertions.assertEquals("Produto adicionado com sucesso", mensagemApresentada);
 
-
-        //Vou submeter o formulario
-        navegador.findElement(By.cssSelector("button[type='submit']")).click();//clicar no botão de enviar o formulario
-
-
-       //Vou validar que a mgs de erro foi apresentada(então vai aparecer um toast, quando isso ocorrer eu vou pegar esse texto[getText] e
-        // jogar na variavel [String mensagemToast] e eu quero validar a mgs será igual ao texto que eu esperava[assertions.assertEquals] )
-        // <div class="toast rounded" style="top: 0px; opacity: 1;">O valor do produto deve estar entre R$ 0,01 e R$ 7.000,00</div>
-
-        String mensagemToast = navegador.findElement(By.cssSelector(".toast.rounded")).getText();//identificar a mgs atraves da classe toast e class rounded
-        Assertions.assertEquals("O valor do produto deve estar entre R$ 0,01 e R$ 7.000,00", mensagemToast);
-
+    }
+    //sera executado apos os testes
+    @AfterEach
+    public void afterEach(){
         //Vou fechar o navegador
         //navegador.quit();
     }
