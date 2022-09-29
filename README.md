@@ -19,7 +19,11 @@ Esse é um repositório que contém a automação de alguns testes Web de um sof
 3. Maximizar a tela
 4. Navegar para a página Lojinha Web
 5. Fazer login com usuário administrador
-6. Adicionar um novo produto com o valor zerado para coincidir com Regra de Negócio que diz que o produto deve estar entre R$0,01  e R$7.000,00.
+6. Adicionar um novo produto com o valor zerado para coincidir com Regra de Negócio que diz que o produto deve estar entre R$0,01  e R$7.000,00,  com validação da mensagem de 'O valor do produto deve estar entre R$ 0,01 e R$ 7.000,00'.
+7. Adicionar um novo produto com o valor de um centavo que estejam na faixa de 0,01 a 7.000,00, com validação da mensagem de 'Produto adicinado com sucesso'.
+8. Adicionar um novo produto com o valor acima de sete mil para coincidir com Regra de Negócio que diz que o produto deve estar entre R$0,01  e R$7.000,00,  com validação da mensagem de 'O valor do produto deve estar entre R$ 0,01 e R$ 7.000,00'.
+9. Adicionar um produto que estejam na faixa de 0,01 a 7.000,00 com validação da mensagem de 'Produto adicinado com sucesso'.
+10. Fechar o navegador Chrome.
 
 ## Notas Gerais
 
