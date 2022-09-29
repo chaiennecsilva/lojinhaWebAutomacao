@@ -24,3 +24,4 @@ Esse é um repositório que contém a automação de alguns testes Web de um sof
 ## Notas Gerais
 
 - Notasse que possui um outro teste automatizado que está no comentário que possibilita fechar o navegador após todo o fluxo listado acima.
+- Refatoração do código segundo o padrão Page Objects.
